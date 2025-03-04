@@ -60,6 +60,6 @@ Good luck!
 
 
 ### Implementation README
-Hello, to run the code locally, start up the server as stated in the instructions file, node ./api/index, and for the front end do cd client --> npm start. 
+Hello, to run the code locally, start up the server as stated in the instructions file, node ./api/index, and for the front end do cd client --> npm start, and navigate to http://localhost:3000/. 
 For specific funcitonallity of functions and React elements see inline comments, however generally you can click on participant names to seea focused view of the patients, search for specific patients names in the search bar (or any matches containing search value if providing just first or last, or part of a name), sort alphabetically (A-Z and Z-A), by count (ascending and descending), and the default unsorted view. If you want to return the the home page, you can click the intus icon in the navbar to do so (for this challenge it will return you to the list view). Alphabetical sorting is done by first name, since aprticpants names are displayed FirstName LastName. I utilized node-persist for the cache and materials-ui for front end styling, with typescript for front end files and javascript for backend files.
 
