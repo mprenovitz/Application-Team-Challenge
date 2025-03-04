@@ -79,62 +79,62 @@ async function countICD(){
         seen_codes.push(code);
       } 
     })
-    //add the counts and unique codes for each participant
+    //add
     icdCounts[participant.firstName + "_" + participant.lastName] = seen_codes.length
     icdCodes[participant.firstName + "_" + participant.lastName] = seen_codes
   });
   return {icdCounts, icdCodes}
 }
 
-//sort the icds in different orders (by count or alphabetical)
+
 function sortICD(icdCounts){
   const ret = {};
 
     ret["alph_desc"] = Object.entries(icdCounts)
-      .sort (([a,], [b,]) => b.localeCompare(a)) //sort using local compare for chars, then reduce back into dict
+      .sort (([a,], [b,]) => b.localeCompare(a))
       .reduce((dict, [key, val]) =>{
         dict[key] = val;
         return dict;
       }, {});
     ret["alph_asc"]= Object.entries(icdCounts)
-      .sort (([a,], [b,]) => a.localeCompare(b)) //sort using local compare for chars, then reduce back into dict
+      .sort (([a,], [b,]) => a.localeCompare(b))
       .reduce((dict, [key, val]) =>{
         dict[key] = val;
         return dict;
       }, {});
     ret["asc"] = Object.keys(icdCounts)
-      .sort ((a, b) => icdCounts[a] - icdCounts[b]) //sort by count, then reduce back into dict
+      .sort ((a, b) => icdCounts[a] - icdCounts[b])
       .reduce((dict, key) =>{
         dict[key] = icdCounts[key];
         return dict;
       }, {});
   ret["desc"] = Object.keys(icdCounts)
-      .sort ((a, b) => icdCounts[b] - icdCounts[a]) //sort by count, then reduce back into dict
+      .sort ((a, b) => icdCounts[b] - icdCounts[a])
       .reduce((dict, key) =>{
         dict[key] = icdCounts[key];
         return dict;
       }, {});
     return ret;
   }
-  //uses clinical tables api to get names/diagnoses associated with ICD-10 codes
   async function focusView(diagnoses){
     const ret = {};
-    for(const code of Array.from(diagnoses)){ //for each code passed in, either retrieve from the cache or call the api
+    for(const code of Array.from(diagnoses)){
       const key = `cache_for_${code}`;
       const cache = await storage.getItem(key);
-      if (cache && Date.now() - cache.timestamp < timeout){ //if still valid in the cache, retrieve
+      if (cache && Date.now() - cache.timestamp < timeout){
         console.log(`Cache hit for ${key}`);
         ret[code] = cache.name;
-      } else { //if expired retrieve from the API
+      } else {
         try {
-          storage.clear()
+          storage.removeItem(key)
           const res = await fetch(BASE_URL + code);
           if (res.status != 200){
             console.error("Could not fetch from Clinical Tables, verify connection to API")
           }
           const data = await res.json()
-          await storage.setItem(key, {name: data.name, timestamp: Date.now()})
-          ret[code] = data[3]; //[3] of the return is the pairs of code-->names
+          const names = data[3]
+          await storage.setItem(key, {name: names, timestamp: Date.now()})
+          ret[code] = names;
         } catch (error) {
           console.error("Error fetching names from Clinical Tables:", error.message);
           throw error;
